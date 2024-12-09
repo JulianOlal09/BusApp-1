@@ -10,20 +10,31 @@ use Illuminate\Support\Facades\Gate;
 
 class AutobusController extends Controller
 {
-    public function index()
+    // Método para obtener autobuses
+    public function index(Request $request)
     {
         $autobuses = Autobus::with('sucursal', 'ruta')->get();
+
+        // Si la solicitud es para una API, devuelve JSON
+        if ($request->wantsJson()) {
+            return response()->json($autobuses, 200);
+        }
+
+        // Si no, devuelve la vista para el sitio web
         return view('autobuses.index', compact('autobuses'));
     }
 
+    // Método para mostrar el formulario de creación de autobús
     public function create()
     {
         Gate::authorize('admin');
         $sucursales = Sucursal::all();
         $rutas = Ruta::all();
+
         return view('autobuses.create', compact('sucursales', 'rutas'));
     }
 
+    // Método para almacenar un autobús
     public function store(Request $request)
     {
         Gate::authorize('admin');
@@ -37,23 +48,30 @@ class AutobusController extends Controller
             'ruta_id' => 'required|exists:rutas,id',
         ]);
 
-        Autobus::create($request->all());
+        $autobus = Autobus::create($request->all());
+
+        // Si es una solicitud API, retorna JSON
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Autobús creado exitosamente.', 'autobus' => $autobus], 201);
+        }
+
+        // Si es una solicitud de la web, redirige
         return redirect()->route('autobuses.index')->with('success', 'Autobús creado exitosamente.');
     }
 
-    public function show(Autobus $autobus)
+    // Mostrar un autobús específico
+    public function show(Autobus $autobus, Request $request)
     {
+        // Si la solicitud es de una API, devuelve JSON
+        if ($request->wantsJson()) {
+            return response()->json($autobus, 200);
+        }
+
+        // Si no, devuelve la vista del autobús
         return view('autobuses.show', compact('autobus'));
     }
 
-    public function edit(Autobus $autobus)
-    {
-        Gate::authorize('admin');
-        $sucursales = Sucursal::all();
-        $rutas = Ruta::all();
-        return view('autobuses.edit', compact('autobus', 'sucursales', 'rutas'));
-    }
-
+    // Actualizar un autobús
     public function update(Request $request, Autobus $autobus)
     {
         Gate::authorize('admin');
@@ -68,13 +86,28 @@ class AutobusController extends Controller
         ]);
 
         $autobus->update($request->all());
+
+        // Si es una solicitud API, devuelve JSON
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Autobús actualizado exitosamente.', 'autobus' => $autobus], 200);
+        }
+
+        // Si no, redirige a la vista
         return redirect()->route('autobuses.index')->with('success', 'Autobús actualizado exitosamente.');
     }
 
-    public function destroy(Autobus $autobus)
+    // Eliminar un autobús
+    public function destroy(Autobus $autobus, Request $request)
     {
         Gate::authorize('admin');
         $autobus->delete();
+
+        // Si es una solicitud API, devuelve JSON
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Autobús eliminado exitosamente.'], 200);
+        }
+
+        // Si no, redirige a la vista
         return redirect()->route('autobuses.index')->with('success', 'Autobús eliminado exitosamente.');
     }
 }

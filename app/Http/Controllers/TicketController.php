@@ -43,46 +43,25 @@ class TicketController extends Controller
     // Guardar un nuevo ticket
     public function store(Request $request)
     {
-        // Si es una solicitud de la API (verificamos si está en formato JSON)
-        if ($request->wantsJson()) {
-            // Validar los parámetros necesarios para crear el ticket
-            $request->validate([
-                'CodigoReserva' => 'required|unique:tickets',
-                'precio' => 'required|numeric|min:0',
-                'usuario_id' => 'required|exists:users,id',
-                'autobus_id' => 'required|exists:autobuses,id',
-                'sucursal_id' => 'required|exists:sucursales,id',
-                'horario_id' => 'required|exists:horarios,id',
-                'ruta_id' => 'required|exists:rutas,id',
-            ]);
+    $request->validate([
+        'CodigoReserva' => 'required|unique:tickets',
+        'precio' => 'required|numeric|min:0',
+        'usuario_id' => 'required|exists:users,id',
+        'autobus_id' => 'required|exists:autobuses,id',
+        'sucursal_id' => 'required|exists:sucursales,id',
+        'horario_id' => 'required|exists:horarios,id',
+        'ruta_id' => 'required|exists:rutas,id',
+    ]);
 
-            // Crear el ticket con los datos proporcionados
-            $ticket = Ticket::create($request->all());
+    $ticket = Ticket::create($request->all());
 
-            // Devolver la respuesta en formato JSON
-            return response()->json(['message' => 'Ticket creado exitosamente.', 'ticket' => $ticket], 201);
-        }
-
-        // Si es una solicitud web (página)
-        Gate::authorize('admin');
-
-        // Validar los parámetros necesarios para crear el ticket
-        $request->validate([
-            'CodigoReserva' => 'required|unique:tickets',
-            'precio' => 'required|numeric|min:0',
-            'usuario_id' => 'required|exists:users,id',
-            'autobus_id' => 'required|exists:autobuses,id',
-            'sucursal_id' => 'required|exists:sucursales,id',
-            'horario_id' => 'required|exists:horarios,id',
-            'ruta_id' => 'required|exists:rutas,id',
-        ]);
-
-        // Crear el ticket con los datos proporcionados
-        Ticket::create($request->all());
-
-        // Redirigir con mensaje de éxito
-        return redirect()->route('tickets.index')->with('success', 'Ticket creado exitosamente.');
+    if ($request->wantsJson()) {
+        return response()->json(['message' => 'Ticket creado exitosamente.', 'ticket' => $ticket], 201);
     }
+
+    return redirect()->route('tickets.index')->with('success', 'Ticket creado exitosamente.');
+    }
+
 
     // Mostrar los detalles de un ticket
     public function show(Ticket $ticket)

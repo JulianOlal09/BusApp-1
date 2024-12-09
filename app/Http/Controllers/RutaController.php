@@ -6,7 +6,6 @@ use App\Models\Ruta;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 
 class RutaController extends Controller
 {

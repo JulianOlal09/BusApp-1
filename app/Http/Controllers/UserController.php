@@ -9,13 +9,19 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     // Mostrar lista de usuarios
-    public function index()
+    public function index(Request $request)
     {
-        Gate::authorize('admin'); // Aseguramos que solo los admin puedan acceder
-
-        $users = User::all();  // Obtener todos los usuarios
-        return view('usuarios.index', compact('users'));  // Devuelve la vista con los usuarios
+        Gate::authorize('admin');
+    
+        $users = User::all();
+    
+        if ($request->wantsJson()) {
+            return response()->json($users, 200);
+        }
+    
+        return view('usuarios.index', compact('users'));
     }
+    
 
     // Mostrar el formulario para crear un nuevo usuario
     public function create()
