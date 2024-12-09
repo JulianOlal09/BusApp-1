@@ -8,6 +8,9 @@ use App\Models\Ruta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+
+
+
 class AutobusController extends Controller
 {
     // Método para obtener autobuses
